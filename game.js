@@ -7,6 +7,9 @@ const etaEl = document.querySelector('#eta');
 const statusEl = document.querySelector('#status');
 const engageButton = document.querySelector('#engageButton');
 const cancelButton = document.querySelector('#cancelButton');
+const speedDownButton = document.querySelector('#speedDownButton');
+const speedUpButton = document.querySelector('#speedUpButton');
+const speedLabel = document.querySelector('#speedLabel');
 
 const SUN_X = canvas.width / 2;
 const SUN_Y = canvas.height / 2;
@@ -30,6 +33,7 @@ const state = {
   selectedBodyName: null,
   route: null,
   ship: { x: 0, y: 0, routeIndex: 0, engaged: false, speed: 180 },
+  simulationSpeedPercent: 100,
 };
 
 function setStatus(text, mode = 'normal') {
@@ -312,8 +316,25 @@ function updateShip(delta) {
   }
 }
 
+
+function updateSpeedLabel() {
+  speedLabel.textContent = `${state.simulationSpeedPercent}%`;
+}
+
+function adjustSimulationSpeed(deltaPercent) {
+  const next = Math.max(10, Math.min(300, state.simulationSpeedPercent + deltaPercent));
+  state.simulationSpeedPercent = next;
+  updateSpeedLabel();
+  if (next === 100) {
+    setStatus('Simulation speed set to realtime baseline (100%).');
+  } else {
+    setStatus(`Simulation speed set to ${next}% of baseline.`, 'ok');
+  }
+}
+
 function render(delta) {
-  state.time += delta * 60;
+  const speedFactor = state.simulationSpeedPercent / 100;
+  state.time += delta * 60 * speedFactor;
   state.bodyMap = simulateBodies(state.time);
 
   if (!state.ship.engaged) {
@@ -404,12 +425,15 @@ canvas.addEventListener('click', (event) => {
 
 engageButton.addEventListener('click', engageRoute);
 cancelButton.addEventListener('click', cancelRoute);
+speedDownButton.addEventListener('click', () => adjustSimulationSpeed(-10));
+speedUpButton.addEventListener('click', () => adjustSimulationSpeed(10));
 
 initAsteroids();
 state.bodyMap = simulateBodies(0);
 const earth = state.bodyMap.get('Earth');
 state.ship.x = earth.x;
 state.ship.y = earth.y;
+updateSpeedLabel();
 
 let last = performance.now();
 function loop(now) {

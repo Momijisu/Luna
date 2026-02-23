@@ -59,6 +59,22 @@ h1 {
   margin-bottom: 0.9rem;
 }
 
+.speed-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-bottom: 0.8rem;
+  background: #1b2550;
+  border-radius: 10px;
+  padding: 0.5rem 0.7rem;
+}
+
+.speed-controls .speed-note {
+  color: #b9c6ff;
+  font-size: 0.9rem;
+}
+
 button {
   border: 0;
   border-radius: 999px;
