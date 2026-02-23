@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orbital Commander</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <h1>Orbital Commander</h1>
+      <p class="subtitle">You command a ship from Earth. Plot a route, then engage.</p>
+
+      <section class="hud" aria-live="polite">
+        <p>Current Body: <strong id="currentBody">Earth</strong></p>
+        <p>Selected Body: <strong id="selectedBody">None</strong></p>
+        <p>Route ETA: <strong id="eta">--</strong></p>
+      </section>
+
+      <section class="speed-controls" aria-label="Simulation speed controls">
+        <span>Simulation speed:</span>
+        <button id="speedDownButton" type="button">÷10</button>
+        <strong id="speedLabel">1x</strong>
+        <button id="speedUpButton" type="button">×10</button>
+        <span class="speed-note">(default is 1x realtime)</span>
+      </section>
+
+      <div class="controls">
+        <button id="engageButton" type="button" disabled>Engage route</button>
+        <button id="cancelButton" type="button" disabled>Cancel route</button>
+      </div>
+
+      <canvas id="gameCanvas" width="1200" height="760" aria-label="Orbital map simulation"></canvas>
+      <p id="status" class="status">Click a planet or moon to preview a gravity-assisted route.</p>
+    </main>
+
+    <script src="game.js" defer></script>
+  </body>
+</html>
