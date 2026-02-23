@@ -26,7 +26,7 @@ const PLANETS = [
 ];
 
 const state = {
-  time: 0,
+  simTimeDays: 0,
   bodyMap: new Map(),
   asteroids: [],
   currentBodyName: 'Earth',
@@ -73,13 +73,13 @@ function initAsteroids() {
   }));
 }
 
-function simulateBodies(simTime = state.time) {
+function simulateBodies(simTimeDays = state.simTimeDays) {
   const bodyMap = new Map();
 
   bodyMap.set('Sun', { name: 'Sun', x: SUN_X, y: SUN_Y, radius: 18, mass: 28000, color: '#ffcc67' });
 
   PLANETS.forEach((planet, index) => {
-    const angle = (simTime * (Math.PI * 2)) / Math.max(planet.periodDays / 26, 1) + index * 0.55;
+    const angle = (simTimeDays * (Math.PI * 2)) / planet.periodDays + index * 0.55;
     const r = orbitPx(planet.orbitAU);
     const px = SUN_X + Math.cos(angle) * r;
     const py = SUN_Y + Math.sin(angle) * r * 0.68;
@@ -88,7 +88,7 @@ function simulateBodies(simTime = state.time) {
     bodyMap.set(planet.name, { name: planet.name, x: px, y: py, radius: pr, mass: Math.max(100, planet.radiusKm / 95), color: planet.color });
 
     planet.moons.forEach((moon, moonIndex) => {
-      const ma = (simTime * (Math.PI * 2)) / Math.max(moon.periodDays / 23, 0.09) + moonIndex * 1.9;
+      const ma = (simTimeDays * (Math.PI * 2)) / moon.periodDays + moonIndex * 1.9;
       const mr = moonOrbitPx(moon.orbitKm, pr);
       const mx = px + Math.cos(ma) * mr;
       const my = py + Math.sin(ma) * mr * 0.82;
@@ -321,21 +321,27 @@ function updateSpeedLabel() {
   speedLabel.textContent = `${state.simulationSpeedPercent}%`;
 }
 
+function updateSpeedButtons() {
+  speedDownButton.disabled = state.simulationSpeedPercent <= 100;
+  speedUpButton.disabled = state.simulationSpeedPercent >= 5000;
+}
+
 function adjustSimulationSpeed(deltaPercent) {
-  const next = Math.max(10, Math.min(300, state.simulationSpeedPercent + deltaPercent));
+  const next = Math.max(100, Math.min(5000, state.simulationSpeedPercent + deltaPercent));
   state.simulationSpeedPercent = next;
   updateSpeedLabel();
+  updateSpeedButtons();
   if (next === 100) {
-    setStatus('Simulation speed set to realtime baseline (100%).');
+    setStatus('Simulation speed set to realtime baseline (1x).');
   } else {
-    setStatus(`Simulation speed set to ${next}% of baseline.`, 'ok');
+    setStatus(`Simulation speed set to ${(next / 100).toFixed(2)}x realtime.`, 'ok');
   }
 }
 
 function render(delta) {
   const speedFactor = state.simulationSpeedPercent / 100;
-  state.time += delta * 60 * speedFactor;
-  state.bodyMap = simulateBodies(state.time);
+  state.simTimeDays += (delta * speedFactor) / 86400;
+  state.bodyMap = simulateBodies(state.simTimeDays);
 
   if (!state.ship.engaged) {
     const currentBody = state.bodyMap.get(state.currentBodyName);
@@ -434,6 +440,7 @@ const earth = state.bodyMap.get('Earth');
 state.ship.x = earth.x;
 state.ship.y = earth.y;
 updateSpeedLabel();
+updateSpeedButtons();
 
 let last = performance.now();
 function loop(now) {
