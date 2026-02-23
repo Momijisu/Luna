@@ -33,7 +33,7 @@ const state = {
   selectedBodyName: null,
   route: null,
   ship: { x: 0, y: 0, routeIndex: 0, engaged: false, speed: 180 },
-  simulationSpeedPercent: 100,
+  simulationSpeedMultiplier: 1,
 };
 
 function setStatus(text, mode = 'normal') {
@@ -318,28 +318,33 @@ function updateShip(delta) {
 
 
 function updateSpeedLabel() {
-  speedLabel.textContent = `${state.simulationSpeedPercent}%`;
+  speedLabel.textContent = `${state.simulationSpeedMultiplier}x`;
 }
 
 function updateSpeedButtons() {
-  speedDownButton.disabled = state.simulationSpeedPercent <= 100;
-  speedUpButton.disabled = state.simulationSpeedPercent >= 5000;
+  speedDownButton.disabled = state.simulationSpeedMultiplier <= 1;
+  speedUpButton.disabled = state.simulationSpeedMultiplier >= 1000;
 }
 
-function adjustSimulationSpeed(deltaPercent) {
-  const next = Math.max(100, Math.min(5000, state.simulationSpeedPercent + deltaPercent));
-  state.simulationSpeedPercent = next;
+function adjustSimulationSpeed(direction) {
+  if (direction > 0) {
+    state.simulationSpeedMultiplier = Math.min(1000, state.simulationSpeedMultiplier * 10);
+  } else {
+    state.simulationSpeedMultiplier = Math.max(1, state.simulationSpeedMultiplier / 10);
+  }
+
   updateSpeedLabel();
   updateSpeedButtons();
-  if (next === 100) {
+
+  if (state.simulationSpeedMultiplier === 1) {
     setStatus('Simulation speed set to realtime baseline (1x).');
   } else {
-    setStatus(`Simulation speed set to ${(next / 100).toFixed(2)}x realtime.`, 'ok');
+    setStatus(`Simulation speed set to ${state.simulationSpeedMultiplier}x realtime.`, 'ok');
   }
 }
 
 function render(delta) {
-  const speedFactor = state.simulationSpeedPercent / 100;
+  const speedFactor = state.simulationSpeedMultiplier;
   state.simTimeDays += (delta * speedFactor) / 86400;
   state.bodyMap = simulateBodies(state.simTimeDays);
 
@@ -431,8 +436,8 @@ canvas.addEventListener('click', (event) => {
 
 engageButton.addEventListener('click', engageRoute);
 cancelButton.addEventListener('click', cancelRoute);
-speedDownButton.addEventListener('click', () => adjustSimulationSpeed(-10));
-speedUpButton.addEventListener('click', () => adjustSimulationSpeed(10));
+speedDownButton.addEventListener('click', () => adjustSimulationSpeed(-1));
+speedUpButton.addEventListener('click', () => adjustSimulationSpeed(1));
 
 initAsteroids();
 state.bodyMap = simulateBodies(0);

@@ -12,7 +12,7 @@ A static browser game where you command a spaceship through a moving Solar Syste
   - click a planet or moon to preview a transfer path,
   - a route line is drawn using a simple gravity-influenced path solver,
   - press **Engage route** to fly the ship along that path,
-  - adjust simulation speed with **-10 / +10** controls (default 100% = 1x realtime),
+  - adjust simulation speed with **×10 / ÷10** controls (default is 1x realtime),
   - arrive and continue from your new current orbital body.
 
 ## Play locally
