@@ -5,6 +5,7 @@
   --accent: #81ecff;
   --warning: #ffd166;
   --danger: #ff6d8f;
+  --ok: #92ffb7;
 }
 
 * {
@@ -22,7 +23,7 @@ body {
 }
 
 .app {
-  width: min(96vw, 1140px);
+  width: min(96vw, 1240px);
   background: color-mix(in oklab, var(--panel), black 14%);
   border-radius: 18px;
   padding: 1.25rem;
@@ -69,7 +70,7 @@ button {
 }
 
 button:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
@@ -96,7 +97,12 @@ canvas {
   font-weight: 700;
 }
 
-@media (max-width: 820px) {
+.status.ok {
+  color: var(--ok);
+  font-weight: 700;
+}
+
+@media (max-width: 860px) {
   .hud {
     grid-template-columns: 1fr;
   }
